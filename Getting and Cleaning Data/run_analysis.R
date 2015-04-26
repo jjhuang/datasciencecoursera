@@ -8,8 +8,8 @@ Y_test = read.table('./UCI HAR Dataset/test/y_test.txt')
 
 names(Y_train) <- c("activity")
 names(Y_test) <- c("activity")
-# subject_train = read.table('./UCI HAR Dataset/train/subject_train.txt')
-# subject_test = read.table('./UCI HAR Dataset/test/subject_test.txt')
+subject_train = read.table('./UCI HAR Dataset/train/subject_train.txt')
+subject_test = read.table('./UCI HAR Dataset/test/subject_test.txt')
 names(subject_train) <- c("subject")
 names(subject_test) <- c("subject")
 
