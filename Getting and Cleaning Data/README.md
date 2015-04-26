@@ -19,71 +19,23 @@ This is the repository containing the script for the 'Getting and Cleaning Data'
 13. To produce our tidy dataset, a series of *gsub* commands were used to consistently replace all the common abbreviations with a long form name.
 
 ## Codebook
-* *timeBodyAccelerometerAverageAlongXAxis*
-* *timeBodyAccelerometerAverageAlongYAxis*
-* *timeBodyAccelerometerAverageAlongZAxis*
-* *timeBodyAccelerometerStandardDeviationAlongXAxis*
-* *timeBodyAccelerometerStandardDeviationAlongYAxis*
-* *timeBodyAccelerometerStandardDeviationAlongZAxis*
-* *timeGravityAccelerometerAverageAlongXAxis*
-* *timeGravityAccelerometerAverageAlongYAxis*
-* *timeGravityAccelerometerAverageAlongZAxis*
-* *timeGravityAccelerometerStandardDeviationAlongXAxis*
-* *timeGravityAccelerometerStandardDeviationAlongYAxis*
-* *timeGravityAccelerometerStandardDeviationAlongZAxis*
-* *timeBodyAccelerometerJerkAverageAlongXAxis*
-* *timeBodyAccelerometerJerkAverageAlongYAxis*
-* *timeBodyAccelerometerJerkAverageAlongZAxis*
-* *timeBodyAccelerometerJerkStandardDeviationAlongXAxis*
-* *timeBodyAccelerometerJerkStandardDeviationAlongYAxis*
-* *timeBodyAccelerometerJerkStandardDeviationAlongZAxis*
-* *timeBodyGyrometerAverageAlongXAxis*
-* *timeBodyGyrometerAverageAlongYAxis*
-* *timeBodyGyrometerAverageAlongZAxis*
-* *timeBodyGyrometerStandardDeviationAlongXAxis*
-* *timeBodyGyrometerStandardDeviationAlongYAxis*
-* *timeBodyGyrometerStandardDeviationAlongZAxis*
-* *timeBodyGyrometerJerkAverageAlongXAxis*
-* *timeBodyGyrometerJerkAverageAlongYAxis*
-* *timeBodyGyrometerJerkAverageAlongZAxis*
-* *timeBodyGyrometerJerkStandardDeviationAlongXAxis*
-* *timeBodyGyrometerJerkStandardDeviationAlongYAxis*
-* *timeBodyGyrometerJerkStandardDeviationAlongZAxis*
-* *timeBodyAccelerometerMagnitudeAverage*
-* *timeBodyAccelerometerMagnitudeStandardDeviation*
-* *timeGravityAccelerometerMagnitudeAverage*
-* *timeGravityAccelerometerMagnitudeStandardDeviation*
-* *timeBodyAccelerometerJerkMagnitudeAverage*
-* *timeBodyAccelerometerJerkMagnitudeStandardDeviation*
-* *timeBodyGyrometerMagnitudeAverage*
-* *timeBodyGyrometerMagnitudeStandardDeviation*
-* *timeBodyGyrometerJerkMagnitudeAverage*
-* *timeBodyGyrometerJerkMagnitudeStandardDeviation*
-* *frequencyBodyAccelerometerAverageAlongXAxis*
-* *frequencyBodyAccelerometerAverageAlongYAxis*
-* *frequencyBodyAccelerometerAverageAlongZAxis*
-* *frequencyBodyAccelerometerStandardDeviationAlongXAxis*
-* *frequencyBodyAccelerometerStandardDeviationAlongYAxis*
-* *frequencyBodyAccelerometerStandardDeviationAlongZAxis*
-* *frequencyBodyAccelerometerJerkAverageAlongXAxis*
-* *frequencyBodyAccelerometerJerkAverageAlongYAxis*
-* *frequencyBodyAccelerometerJerkAverageAlongZAxis*
-* *frequencyBodyAccelerometerJerkStandardDeviationAlongXAxis*
-* *frequencyBodyAccelerometerJerkStandardDeviationAlongYAxis*
-* *frequencyBodyAccelerometerJerkStandardDeviationAlongZAxis*
-* *frequencyBodyGyrometerAverageAlongXAxis*
-* *frequencyBodyGyrometerAverageAlongYAxis*
-* *frequencyBodyGyrometerAverageAlongZAxis*
-* *frequencyBodyGyrometerStandardDeviationAlongXAxis*
-* *frequencyBodyGyrometerStandardDeviationAlongYAxis*
-* *frequencyBodyGyrometerStandardDeviationAlongZAxis*
-* *frequencyBodyAccelerometerMagnitudeAverage*
-* *frequencyBodyAccelerometerMagnitudeStandardDeviation*
-* *frequencyBodyBodyAccelerometerJerkMagnitudeAverage*
-* *frequencyBodyBodyAccelerometerJerkMagnitudeStandardDeviation*
-* *frequencyBodyBodyGyrometerMagnitudeAverage*
-* *frequencyBodyBodyGyrometerMagnitudeStandardDeviation*
-* *frequencyBodyBodyGyrometerJerkMagnitudeAverage*
-* *frequencyBodyBodyGyrometerJerkMagnitudeStandardDeviation*
 * *activity*
+The activity being performed, being one of WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING or LAYING
 * *subject*
+The ID number of the subject.
+
+In general (with exceptions), the measurement variables follow a naming convention of [DOMAIN][SIGNAL][DEVICE][STATS][DIRECTION] where:
+* Domain:
+Either **time** or **frequency**. Dictates whether this variable is in the raw time series form, or if a Fourier Transform has been applied to render it in the frequency domain.
+* Signal:
+Either **Body** or **Gravity**. Dictates whether it was a body or gravity signal that was measured.
+* Device:
+Either **Gyrometer** or **Accelerometer**. Dictates whether the signal was measured using a gyrometer or an accelerometer.
+* Stats:
+Either **Average** or **Standard Deviation**. This tells you whether this number is an average statistic or a standard deviation.
+* Direction *(optional)*:
+If this exists, this indicates that this was a vector measurement taken along one of the three axis. If not, then this measurement is a **magnitude**.
+
+Examples:
+* **timeBodyAccelerometerAverageAlongXAxis**: This is an averaged time-domain measurement of body acceleration along the X-axis, using an accelerometer.
+* **frequencyBodyBodyGyrometerJerkMagnitudeStandardDeviation**: This is a standard deviation of a frequency-domain measurement of the magnitude body jerk motion using a gyrometer.
