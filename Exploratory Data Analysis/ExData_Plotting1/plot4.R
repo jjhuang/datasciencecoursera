@@ -1,9 +1,8 @@
 data <- read.table("../household_power_consumption.txt", sep=";",skip=66637,nrows=2881)
-names(data) <- unlist(read.table("./household_power_consumption.txt", sep=";",nrows=1))
+names(data) <- unlist(read.table("../household_power_consumption.txt", sep=";",nrows=1))
 data$datetime <- strptime(paste(data$Date, data$Time), format="%d/%m/%Y %H:%M:%S")
-
 png(filename='plot4.png')
-par(mfrow=c(2,2))
+par(mfrow=c(2,2), bg=NA)
 plot(x=data$datetime, y=data$Global_active_power, xlab="", ylab="Global Active Power", type="l")
 plot(x=data$datetime, y=data$Voltage, xlab="datetime", ylab="Voltage", type="l")
 plot(x=data$datetime, y=data$Sub_metering_1, xlab="", ylab="Energy sub metering", type="l")
