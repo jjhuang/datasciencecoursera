@@ -1,25 +1,144 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "Peer Assignment 1"
+author: "Justin Huang"
+output: html_document
 ---
+Introduction
+======================
+This is the first Peer Assignment for Coursera's *Reproducible Research* class. In this document, we will be exploring movement data collected from activity monitoring devices (such as a Fitbit, Nike Fuelband or Jawbone Up) and attempt to draw some basic conclusions about the user's behavior and lifestyle.
 
+### Data
+The basic data is composed of three columns: *date*, *interval*, and *steps*:
 
-## Loading and preprocessing the data
+- **date**: The date (%Y-%m-%d) on which the data was collected.
+- **interval**: The 5-minute interval on a certain day in which the data was collected.
+- **steps**: The total number of steps counted within an interval on a certain day.
 
+Procedure
+===================
+### Loading and Preprocessing Data
+We begin by loading the unzipped `activity.csv` and reading it into R. We covert it into a dataframe, and preprocess the data by converting the `date` column into a Date type.
+```{r, echo=T}
+activity = read.csv('./activity.csv')
+activity <- data.frame(activity)
+activity$date = as.Date(activity$date)
+```
 
+### What is mean total number of steps taken per day?
+The first question posed is, *"what is the average number of [total] steps taken per day?"* To answer this, we do a simple aggregation on the `steps` column of the dataset given the `date`.
 
-## What is mean total number of steps taken per day?
+```{r, echo=T}
+stepsSum <- aggregate(activity$steps,by=list(activity$date),sum,na.rm=T)
+names(stepsSum) <- c("Date", "Steps")
+stepsSum
+```
 
+As the raw calculated data is a little difficult to digest for human eyes, we ease this with a visualization of the data as a histogram.
 
+```{r, echo=T}
+hist(stepsSum$Steps, col='red', xlab='Steps', ylab='Frequency', main='Averaged Total Steps per Day', breaks=8)
+```
 
-## What is the average daily activity pattern?
+By looking at the histogram, we can see that the measured user most commonly walks about 10K ~ 15K steps a day. We notice that there is a particular spike also very close to zero steps, possibly a result of our missing values in the dataset.
 
+It may also be of interest to see what the average and median steps taken per day is as well.
 
+```{r, echo=T}
+stepsAvg <- aggregate(activity$steps,by=list(activity$date),mean,na.rm=T)
+stepsMed <- aggregate(activity$steps,by=list(activity$date),median,na.rm=T)
+stepsAvgMed <- merge(stepsAvg, stepsMed, by='Group.1')
+names(stepsAvgMed) <- c("Date", "Mean", "Median")
+stepsAvgMed
+```
 
-## Imputing missing values
+We saw that although the total steps are often above 10K, on average this user walks very little across intervals. More often than not, this user is not walking, as indicated by the near uniform zero for every day. This implies the user is sitting (or still) for the most part, only walking occasionally.
 
+### What is the average daily activity pattern?
+Looking at the statistics based on the date alone does not seem very interesting. More interesting would be if the user's behavior changes within a single day (eg. in the morning vs the afternoon). We can instead examine the average steps per interval across every day.
 
+```{r, echo=T}
+stepsIntervalAvg <- aggregate(activity$steps,by=list(activity$interval),mean,na.rm=T)
+names(stepsIntervalAvg) <- c("Interval", "Steps")
+plot(stepsIntervalAvg, type="l", col='red', main='Daily Average Steps')
+```
 
-## Are there differences in activity patterns between weekdays and weekends?
+The `interval` field does not exactly account for the full 1440 minutes of the user's day, but we can roughly gather that there is a period of time in which the user is most likely asleep (assuming that they are wearing their monitoring device), from interval 0-500. Once movement starts, there is a movement spike between interval 800-900 in which we may guess that the user may be exercising. The rest of the day would seem to be normal walking until movement ramps down towards the end.
+
+We can see that the peak of movement occurs at Interval 835 with a rough average steps number of 206:
+```{r, echo=T}
+stepsIntervalAvg[stepsIntervalAvg$Steps==max(stepsIntervalAvg$Steps),]
+```
+**206 steps in 5 minutes** indicates **40 steps per minutes**. By contrast, we can consult Purdue University's [Convert Activity Into Steps](http://www.purdue.edu/walktothemoon/activities.html) reference. 40 steps per minute roughly translates to a person doing tai chi! If that is the peak steps of this person's average day, then the measured user must be a sloth! Clearly this is the result of averaging. For pure curiosity of the scope of the assignment, we can look at the maximum number of steps for the same interval 835 out of all the days.
+```{r, echo=T}
+activity[activity$interval==835,][which.max(activity[activity$interval==835,]$steps),]
+```
+This yields us a peak step count of **786 in 5 minutes** (which isn't too far from the overall max of 806), which is **~157 steps per minute**. Referencing Purdue University again, this roughly equates to a user engaging in **very moderate exercise**.
+
+### Inputting missing values
+Very early on in the exercise, it was clear that there were several N/A values within the dataset, forcing us to apply `na.rm=T` to several of our functions. Could this missing data have a significant impact on our analysis? It would be useful to have an idea of how biased our data is based on the number of missing values.
+```{r, echo=T}
+nrow(activity)  # Total rows in dataset
+sum(is.na(activity$steps))  # Total N/A values in dataset
+sum(is.na(activity$steps))/nrow(activity)  # Percentage of missing values
+```
+Over **10%** of our data is missing! If we can interpolate these missing values, it might provide us a better picture of the measured user's daily behavior.
+
+To do this, we will interpolate each missing value with the **average of steps from the same interval** -- as we saw previously that the average by day was also heavily influenced by missing values, and the median by day was more often than not, zero.
+
+```{r, echo=T}
+activityNew <- activity
+for (x in stepsIntervalAvg$Interval) {
+    activityNew[is.na(activityNew$steps) & activityNew$interval==x,]$steps <- stepsIntervalAvg[stepsIntervalAvg$Interval==x,]$Steps
+}
+```
+
+Using this newly created `activityNew` dataset with the missing values filled in, let us see if this changes any of our previous observations.
+```{r, echo=T}
+stepsSumNew <- aggregate(activityNew$steps,by=list(activityNew$date),sum,na.rm=T)
+names(stepsSumNew) <- c("Date", "Steps")
+hist(stepsSumNew$Steps, col='red', xlab='Steps', ylab='Frequency', main='Steps per Day', breaks=8)
+```
+
+From the new histogram, we can already see that the histogram has now assumed a more Gaussian distribution, as we should expect -- as it would be odd that a person either moves or has days where he/she is just sitting idly all day.
+
+```{r, echo=T}
+stepsAvgNew <- aggregate(activityNew$steps,by=list(activityNew$date),mean,na.rm=T)
+stepsMedNew <- aggregate(activityNew$steps,by=list(activityNew$date),median,na.rm=T)
+stepsIntervalAvgNew <- aggregate(activity$steps,by=list(activityNew$interval),mean,na.rm=T)
+names(stepsIntervalAvgNew) <- c("Interval", "Steps")
+plot(stepsIntervalAvgNew, type="l", main='Daily Average Steps', col='red')
+stepsIntervalAvgNew[stepsIntervalAvgNew$Steps==max(stepsIntervalAvgNew$Steps),]
+```
+
+By contrast, the steps by interval averaged over every day does not appear to have changed much at all. This would be expected, as we used this average to interpolate our data. 
+
+### Are there differences in activity patterns between weekdays and weekends?
+Finally, we know that a person's behavior on the weekday vs the weekend would be different. For example, most people attend school or hold an office job on weekdays, whereas they may either partake in more outside activities or in contrary sit at home all day watching television like a couch potato. What class of individual does our measured user belong to? Does his or her behavior change at all whether it is a weekend or not? To determine this, we will have to analyze the data by factoring the dataset into two classes: *weekday* and *weekend*.
+
+```{r, echo=T}
+weekends <- c("Saturday", "Sunday")
+weektype <- factor((weekdays(activityNew$date) %in% weekends)+1L, levels=1:2, labels=c('Weekday', 'Weekend'))
+activityNew <- cbind(activityNew, weektype)
+```
+
+Having introduced a new factor, we can now graph the interval plot averaged across day, by weekday and by weekend.
+
+```{r, fig.height=8, echo=T}
+activityNewWeekday <- activityNew[activityNew$weektype=='Weekday',]
+activityNewWeekend <- activityNew[activityNew$weektype=='Weekend',]
+par(mfrow=c(2,1), bg=NA)
+stepsIntervalWeekdayAvg <- aggregate(activityNewWeekday$steps,by=list(activityNewWeekday$interval),mean,na.rm=T)
+names(stepsIntervalWeekdayAvg) <- c("Interval", "Average Steps")
+plot(stepsIntervalWeekdayAvg, type="l", main='Weekdays', col='red')
+stepsIntervalWeekendAvg <- aggregate(activityNewWeekend$steps,by=list(activityNewWeekend$interval),mean,na.rm=T)
+names(stepsIntervalWeekendAvg) <- c("Interval", "Average Steps")
+plot(stepsIntervalWeekendAvg, type="l", main='Weekends', col='blue')
+```
+dev.off()
+
+From these two graphs a very clear disparity emerges.
+
+- The individual is much more active on weekends -- as seen from more frequent spikes of over 100 steps whereas on weekdays in general the person makes less than 100 steps every interval.
+- The individual wakes up later on weekends as well, as we see a slower ramp up of activity.
+- Similarly, the individual stays up slightly later on weekends as well, or is at least more active than usual later in the evening.
+- In contrast, that 'spike' we saw in the previous graph still exists on the weekend, but of a lower magnitude. Possibly the individual still exercises for a bit, but not as much due to other activities during the day.
