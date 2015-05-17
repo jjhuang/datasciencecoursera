@@ -74,7 +74,7 @@ activity[activity$interval==835,][which.max(activity[activity$interval==835,]$st
 ```
 This yields us a peak step count of **786 in 5 minutes** (which isn't too far from the overall max of 806), which is **~157 steps per minute**. Referencing Purdue University again, this roughly equates to a user engaging in **very moderate exercise**.
 
-### Inputting missing values
+### Imputing missing values
 Very early on in the exercise, it was clear that there were several N/A values within the dataset, forcing us to apply `na.rm=T` to several of our functions. Could this missing data have a significant impact on our analysis? It would be useful to have an idea of how biased our data is based on the number of missing values.
 ```{r, echo=T}
 nrow(activity)  # Total rows in dataset
