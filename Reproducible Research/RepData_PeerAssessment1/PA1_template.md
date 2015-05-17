@@ -323,7 +323,15 @@ plot(stepsIntervalWeekendAvg, type="l", main='Weekends', col='blue')
 ```
 
 ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) 
+
+```r
 dev.off()
+```
+
+```
+## null device 
+##           1
+```
 
 From these two graphs a very clear disparity emerges.
 

@@ -133,8 +133,8 @@ plot(stepsIntervalWeekdayAvg, type="l", main='Weekdays', col='red')
 stepsIntervalWeekendAvg <- aggregate(activityNewWeekend$steps,by=list(activityNewWeekend$interval),mean,na.rm=T)
 names(stepsIntervalWeekendAvg) <- c("Interval", "Average Steps")
 plot(stepsIntervalWeekendAvg, type="l", main='Weekends', col='blue')
-```
 dev.off()
+```
 
 From these two graphs a very clear disparity emerges.
 
